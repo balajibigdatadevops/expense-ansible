@@ -1,0 +1,5 @@
+- name: This playbook using roles for expense application
+  hosts: all
+  become: true
+  roles:
+    - " {{ role_name }}"
