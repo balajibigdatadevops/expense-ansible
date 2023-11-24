@@ -1,5 +1,6 @@
 - name: this playbook contains frontend expense app tasks
   hosts: all
+  become: true
   tasks:
     - name: installing nginx
       ansible.builtin.dnf:
