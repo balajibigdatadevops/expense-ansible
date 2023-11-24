@@ -1,0 +1,46 @@
+- name: configure backend application nodeJs using playbook
+  hosts: all
+  become: true
+  tasks:
+    - name: Disable NodeJS default Version
+      ansible.builtin.shell: dnf module disable nodejs -y
+    - name: Enable NodeJS 18 Version
+      ansible.builtin.shell: dnf module enable nodejs:18 -y
+    - name: Install NodeJS
+      ansible.builtin.dnf:
+        name: nodejs
+        state: present
+    - name: copying backend service file
+      ansible.builtin.copy:
+        src: backend.service
+        dest: /etc/systemd/system/backend.service
+    - name: creating expense user
+      ansible.builtin.user:
+        user: expense
+    - name: deleting app directory
+      ansible.builtin.file:
+        path: /app
+        state: absent
+    - name: creating app directory
+      ansible.builtin.file:
+        path: /app
+        state: directory
+    - name: download and extract application code content
+      ansible.builtin.unarchive:
+        src: https://expense-artifacts.s3.amazonaws.com/backend.zip
+        dest: /app
+        remote_src: yes
+    - name: Download NodeJS Dependencies
+      ansible.builtin.shell: npm install
+      args:
+        chdir: /app
+    - name: load schema
+      ansible.builtin.shell: mysql -h mysql.balajibigdatadevops.online -uroot -p{{ MYSQL_ROOT_PASSWORD }}
+    - name: starting backend service
+      ansible.builtin.systemd:
+        name: backend
+        state: restarted
+        enabled: true
+        daemon_reload: true
+
+
