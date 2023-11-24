@@ -35,7 +35,7 @@
       args:
         chdir: /app
     - name: load schema
-      ansible.builtin.shell: mysql -h mysql.balajibigdatadevops.online -uroot -p{{ MYSQL_ROOT_PASSWORD }}
+      ansible.builtin.shell: mysql -h mysql.balajibigdatadevops.online -uroot -p{{ MYSQL_ROOT_PASSWORD }} < /app/schema/backend.sql
     - name: starting backend service
       ansible.builtin.systemd:
         name: backend
