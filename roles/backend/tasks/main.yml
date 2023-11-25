@@ -37,7 +37,9 @@
         state: present
 
     - name: load schema
-      ansible.builtin.shell: mysql -h mysql-{{ env }}.balajibigdatadevops.online -uroot -p{{ MYSQL_ROOT_PASSWORD }} < /app/schema/backend.sql
+      ansible.builtin.shell: mysql -h {{ lookup('amazon.aws.aws_ssm', 'backend.{{env}}.DB_HOST', region='us-east-1' ) }}
+        -uroot {{ lookup('amazon.aws.aws_ssm', 'backend.{{env}}.DB_USER', region='us-east-1' ) }}
+        -p{{ lookup('amazon.aws.aws_ssm', 'backend.{{env}}.DB_PASSWORD', region='us-east-1' ) }} < /app/schema/backend.sql
 
     - name: starting backend service
       ansible.builtin.systemd:
@@ -45,5 +47,7 @@
         state: restarted
         enabled: true
         daemon_reload: true
+
+
 
 
